@@ -10,6 +10,8 @@ FROM python:3.12-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tesseract-ocr tesseract-ocr-eng \
         fonts-liberation fonts-croscore fonts-dejavu-core fonts-urw-base35 fonts-noto-core \
+        fonts-ebgaramond fonts-lato fonts-roboto fonts-inter fonts-open-sans \
+        fonts-cantarell fonts-texgyre fonts-sil-charis fonts-jetbrains-mono \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

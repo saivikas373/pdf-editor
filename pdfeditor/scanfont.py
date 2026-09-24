@@ -32,6 +32,12 @@ CANDIDATES = [
     "Lucida Grande", "Franklin Gothic Medium", "Source Sans Pro", "PT Sans", "Inter", "Baskerville", "Charter",
     "Hoefler Text", "Times", "Courier", "Menlo", "Consolas", "Andale Mono", "DejaVu Sans", "Liberation Sans",
     "Liberation Serif", "Noto Sans", "Noto Serif",
+    # the metric-compatible clones, which is what a Linux server has instead of the
+    # names above: Arimo/Tinos/Cousine for Arial/Times/Courier, URW for the PostScript
+    # classics, and the open families that PDFs increasingly use directly
+    "Arimo", "Tinos", "Cousine", "Liberation Mono", "DejaVu Serif", "DejaVu Sans Mono",
+    "Nimbus Sans", "Nimbus Roman", "Nimbus Mono PS", "P052", "C059", "URW Bookman", "URW Gothic",
+    "TeX Gyre Termes", "TeX Gyre Heros", "TeX Gyre Pagella", "Charis SIL", "Cantarell", "JetBrains Mono",
 ]
 
 ASPECT_WEIGHT = 1.6  # penalty for a different width-to-height proportion
