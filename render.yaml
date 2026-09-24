@@ -10,7 +10,7 @@ services:
     envVars:
       # the name Render gives the service, and any custom domain added later
       - key: PDF_EDITOR_ALLOWED_HOSTS
-        value: .onrender.com
+        value: .onrender.com, pdf.aitoolduel.com
       - key: PDF_EDITOR_BEHIND_PROXY
         value: "1"
       # AGPL: people using this over the network are entitled to the source
