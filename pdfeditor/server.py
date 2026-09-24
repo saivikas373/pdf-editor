@@ -532,9 +532,30 @@ class Handler(BaseHTTPRequestHandler):
         with open(full, "rb") as f:
             data = f.read()
         ctype = mimetypes.guess_type(full)[0] or "application/octet-stream"
+        if ctype == "text/html":
+            data = _stamp_assets(data)
         if ctype.startswith("text/") or ctype in ("application/javascript", "image/svg+xml"):
             ctype += "; charset=utf-8"
         self._send(200, data, ctype, "no-cache")
+
+
+def _stamp_assets(html: bytes) -> bytes:
+    """Put each stylesheet and script's own timestamp in its URL.
+
+    Without it a browser that has cached the old files keeps using them after a
+    deploy - the page looks broken in a way nobody can explain and a normal reload
+    does not fix.
+    """
+    def version(match: re.Match) -> bytes:
+        rel = match.group(2).decode()
+        path = os.path.join(STATIC_DIR, rel.lstrip("/"))
+        try:
+            stamp = int(os.path.getmtime(path))
+        except OSError:
+            return match.group(0)
+        return b"%s%s?v=%d%s" % (match.group(1), match.group(2), stamp, match.group(3))
+
+    return re.sub(rb'(href="|src=")(/?(?:css|js)/[^"?]+)(")', version, html)
 
 
 class Server(ThreadingHTTPServer):

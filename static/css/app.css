@@ -118,7 +118,7 @@ svg.i.lg { width: 22px; height: 22px; }
   display: flex; align-items: center; gap: 10px; padding: 0 12px 0 14px; background: var(--surface);
   border-bottom: 1px solid var(--border); min-width: 0; z-index: 30;
 }
-.brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 14px; white-space: nowrap; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 14px; white-space: nowrap; text-decoration: none; color: inherit; }
 .brand-mark svg { width: 26px; height: 26px; display: block; }
 .doc-title { display: flex; align-items: center; gap: 6px; min-width: 60px; max-width: 320px; padding-left: 10px; border-left: 1px solid var(--border); }
 .filename-input { border: 1px solid transparent; background: transparent; border-radius: 6px; padding: 5px 7px; font-weight: 550; min-width: 60px; width: 100%; text-overflow: ellipsis; }
@@ -449,14 +449,11 @@ body:not(.no-doc) .empty-state { display: none; }
   .brand-name { display: none; }
 }
 @media (max-width: 960px) {
-  /* the tools do not fit across a phone, so the row scrolls; fade the right edge so
-     it is obvious there is more of it */
-  .toolbar {
-    padding-right: 26px;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
-    scroll-padding-left: 10px;
-  }
+  /* The tools do not fit across a phone, so the row scrolls. A mask would fade its
+     right edge to show that, but masking a scrolling container is exactly the sort of
+     thing WebKit draws differently, and a missing toolbar is worse than a missing
+     hint - so the row simply scrolls. */
+  .toolbar { padding-right: 8px; }
   .toolbar .grow { display: none; }
 
   :root { --sidebar-w: 0px; }
