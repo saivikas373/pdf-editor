@@ -5,6 +5,8 @@ A local PDF editor that runs on your computer and opens in your browser. It can
 highlights and drawings. It can also fill forms, organize pages, and export the
 result. Your files never leave your machine.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/saivikas373/pdf-editor)
+
 ## Start it
 
 | How | What happens |
