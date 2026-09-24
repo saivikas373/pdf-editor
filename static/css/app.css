@@ -449,9 +449,19 @@ body:not(.no-doc) .empty-state { display: none; }
   .brand-name { display: none; }
 }
 @media (max-width: 960px) {
+  /* the tools do not fit across a phone, so the row scrolls; fade the right edge so
+     it is obvious there is more of it */
+  .toolbar {
+    padding-right: 26px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+    scroll-padding-left: 10px;
+  }
+  .toolbar .grow { display: none; }
+
   :root { --sidebar-w: 0px; }
   .sidebar { visibility: hidden; }
-  .tool-btn span { display: none; }
+  .tool-btn .tool-label { display: none; }  /* the label only - the icon has to stay */
   :root { --toolbar-h: 48px; }
   .tool-btn { height: 40px; min-width: 40px; }
   #btn-open-other, .page-indicator { display: none !important; }

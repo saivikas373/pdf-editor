@@ -26,14 +26,16 @@ function buildToolbar() {
       continue;
     }
     const b = h('button', { class: `tool-btn${t.id === S.tool ? ' active' : ''}`, dataset: { tool: t.id }, 'data-tip': t.tip },
-      h('span', { html: icon(t.icon) }), h('span', { text: t.label }));
+      h('span', { class: 'tool-icon', html: icon(t.icon) }), h('span', { class: 'tool-label', text: t.label }));
     b.addEventListener('click', () => tools.setTool(t.id));
     items.push(b);
   }
   items.push(h('div', { class: 'grow' }));
-  const pagesBtn = h('button', { class: 'tool-btn', 'data-tip': 'Organize, rotate, insert and delete pages' }, h('span', { html: icon('pages') }), h('span', { text: 'Pages' }));
+  const pagesBtn = h('button', { class: 'tool-btn', 'data-tip': 'Organize, rotate, insert and delete pages' },
+    h('span', { class: 'tool-icon', html: icon('pages') }), h('span', { class: 'tool-label', text: 'Pages' }));
   pagesBtn.addEventListener('click', () => (S.view === 'pages' ? pages.closeOrganizer() : pages.openOrganizer()));
-  const toolsBtn = h('button', { class: 'tool-btn', 'data-tip': 'More tools' }, h('span', { html: icon('tools') }), h('span', { text: 'Tools' }));
+  const toolsBtn = h('button', { class: 'tool-btn', 'data-tip': 'More tools' },
+    h('span', { class: 'tool-icon', html: icon('tools') }), h('span', { class: 'tool-label', text: 'Tools' }));
   toolsBtn.addEventListener('click', () => showMenu(toolsBtn, toolsMenuItems(), { align: 'right' }));
   items.push(pagesBtn, toolsBtn);
   bar.replaceChildren(...items);
