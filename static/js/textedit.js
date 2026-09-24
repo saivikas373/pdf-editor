@@ -573,7 +573,7 @@ async function deleteEditorText(state) {
       pageId: state.pageId,
       items: state.lines.map((l) => ({ lineId: l.id, origText: l.text, bbox: l.bbox })),
     });
-    await whenPageImageLoaded(state.pageId);
+    await whenPageImageLoaded(state.pageId, { rev: pageById(state.pageId)?.rev });
   } catch {
     /* toast shown by api */
   } finally {
@@ -621,7 +621,8 @@ export async function commitEditor({ cancel = false } = {}) {
       if (result?.overflow > 2) toast('The paragraph got longer and may now overlap the content below it.');
     }
     if (result?.collateral) toast('Some nearby characters overlapped the edited text and may need checking.');
-    await whenPageImageLoaded(state.pageId);
+    // hold the edited text on screen until the page itself shows it
+    await whenPageImageLoaded(state.pageId, { rev: pageById(state.pageId)?.rev });
   } catch {
     /* error toast shown by api layer */
   } finally {

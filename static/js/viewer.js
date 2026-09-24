@@ -91,18 +91,26 @@ function unloadImage(el) {
 }
 
 /** Resolves once the current image of a page has loaded (used to swap editors without flicker). */
-export function whenPageImageLoaded(pageId, timeout = 4000) {
+export function whenPageImageLoaded(pageId, { rev = null, timeout = 8000 } = {}) {
+  // Waiting for "an image to load" is not enough after an edit: the new one may not
+  // have been asked for yet, in which case the old picture is already loaded and this
+  // returns at once - showing the reader their old text back for a moment.  Given a
+  // revision, it waits for that revision to be the picture on screen.
   return new Promise((resolve) => {
     const el = pageEls.get(pageId);
-    if (!el || !el._wantUrl) return resolve();
-    const img = el.querySelector('.page-img');
-    if (img.getAttribute('src') === el._wantUrl) return resolve();
+    if (!el) return resolve();
+    const showing = () => {
+      const src = el.querySelector('.page-img').getAttribute('src') || '';
+      if (!el._wantUrl || src !== el._wantUrl) return false;
+      return rev == null || src.includes(`rev=${rev}`);
+    };
+    if (showing()) return resolve();
     const done = () => {
       clearTimeout(timer);
       off();
       resolve();
     };
-    const handler = (e) => { if (e.detail === pageId) done(); };
+    const handler = (e) => { if (e.detail === pageId && showing()) done(); };
     const off = () => document.removeEventListener('page-image-loaded', handler);
     document.addEventListener('page-image-loaded', handler);
     const timer = setTimeout(done, timeout);
