@@ -73,6 +73,17 @@ check(status == 200, f"the configured host is served ({status})")
 status, _, _ = call("GET", "/api/config", host=f"127.0.0.1:{PORT}")
 check(status == 200, f"localhost still works for the operator ({status})")
 
+print("which hostnames are served:")
+from pdfeditor import config  # noqa: E402
+
+config.ALLOWED_HOSTS = [".onrender.com", "pdf.example.com"]
+for host, want in [("pdf-editor-xy.onrender.com", True), ("pdf.example.com", True), ("10.0.0.7", True),
+                   ("localhost", True), ("[::1]", True), ("evil.example", False),
+                   ("notonrender.com", False), ("pdf.example.com.evil.example", False)]:
+    got = config.host_allowed(host)
+    check(got == want, f"{host} is {'served' if want else 'refused'}")
+config.ALLOWED_HOSTS = ["pdf.example.com"]
+
 print("one visitor cannot reach another's document:")
 status, mine, jar_a = open_doc()
 check(status == 200 and bool(jar_a), "a visitor gets a cookie when they open a document")

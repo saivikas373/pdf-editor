@@ -13,6 +13,9 @@ services:
         value: .onrender.com
       - key: PDF_EDITOR_BEHIND_PROXY
         value: "1"
+      # AGPL: people using this over the network are entitled to the source
+      - key: PDF_EDITOR_SOURCE_URL
+        value: https://github.com/saivikas373/pdf-editor
       # free instances get a tenth of a core, so keep the expensive jobs bounded
       - key: PDF_EDITOR_MAX_UPLOAD_MB
         value: "25"

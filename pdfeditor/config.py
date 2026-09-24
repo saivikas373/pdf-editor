@@ -18,6 +18,16 @@ def _int(name: str, default: int) -> int:
         return default
 
 
+def _is_address(name: str) -> bool:
+    import ipaddress
+
+    try:
+        ipaddress.ip_address(name.strip("[]"))
+        return True
+    except ValueError:
+        return False
+
+
 def _list(name: str) -> list[str]:
     return [part.strip().lower() for part in (os.environ.get(name) or "").split(",") if part.strip()]
 
@@ -32,7 +42,15 @@ ALLOWED_HOSTS = _list("PDF_EDITOR_ALLOWED_HOSTS")
 
 
 def host_allowed(name: str) -> bool:
-    """An entry may be a hostname, or ".example.com" for it and all its subdomains."""
+    """Is this Host header one we serve?
+
+    An entry may be a hostname, or ".example.com" for it and all its subdomains.
+    An address or a bare name with no dots is always accepted: the attack this check
+    exists to stop needs a *name* the attacker controls, so it cannot be an address,
+    and platforms health-check their containers by address or container name.
+    """
+    if not name or "." not in name.strip("[]") or _is_address(name):
+        return True
     for entry in ALLOWED_HOSTS:
         if entry.startswith("."):
             if name == entry[1:] or name.endswith(entry):
