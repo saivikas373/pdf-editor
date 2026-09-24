@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Editor</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Cpath d='M10 7h8l5 5v13a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z' fill='white'/%3E%3Cpath d='M12.5 21.5l1-3.5 6-6 2.5 2.5-6 6z' fill='%234f46e5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="no-doc tool-select">
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" data-icon="logo"></span>
+      <span class="brand-name">PDF Editor</span>
+    </div>
+    <div class="doc-title" hidden>
+      <input id="doc-filename" class="filename-input" spellcheck="false" aria-label="File name">
+      <span id="dirty-dot" class="dirty-dot" title="Unsaved changes" hidden></span>
+    </div>
+    <div class="header-group doc-only">
+      <button class="icon-btn" id="btn-undo" data-icon="undo" data-tip="Undo (⌘Z)" disabled></button>
+      <button class="icon-btn" id="btn-redo" data-icon="redo" data-tip="Redo (⇧⌘Z)" disabled></button>
+    </div>
+    <div class="header-group doc-only zoom-group">
+      <button class="icon-btn" id="btn-zoom-out" data-icon="zoom-out" data-tip="Zoom out (⌘−)"></button>
+      <button class="zoom-value" id="btn-zoom-menu" data-tip="Zoom options">100%</button>
+      <button class="icon-btn" id="btn-zoom-in" data-icon="zoom-in" data-tip="Zoom in (⌘+)"></button>
+    </div>
+    <div class="header-group doc-only page-indicator">
+      <input id="page-input" class="page-input" inputmode="numeric" aria-label="Page number">
+      <span class="page-total">/ <span id="page-total">0</span></span>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="header-group doc-only">
+      <button class="icon-btn" id="btn-search" data-icon="search" data-tip="Find & replace (⌘F)"></button>
+      <button class="icon-btn" id="btn-help" data-icon="keyboard" data-tip="Keyboard shortcuts (?)"></button>
+      <button class="btn ghost" id="btn-open-other" data-icon-left="folder">Open</button>
+      <button class="btn secondary" id="btn-save-path" hidden data-icon-left="save">Save</button>
+      <div class="split-btn">
+        <button class="btn primary" id="btn-download" data-icon-left="download">Download</button>
+        <button class="btn primary split-caret" id="btn-download-menu" data-icon="chevron-down" aria-label="More download options"></button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toolbar doc-only" id="toolbar" aria-label="Tools"></nav>
+
+  <main class="workspace">
+    <aside class="sidebar doc-only" id="sidebar">
+      <div class="sidebar-head">
+        <span>Pages</span>
+        <button class="icon-btn small" id="btn-organize" data-icon="grid" data-tip="Organize pages"></button>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </aside>
+
+    <section class="viewer" id="viewer" tabindex="-1">
+      <div class="pages" id="pages"></div>
+    </section>
+
+    <section class="organizer" id="organizer" hidden>
+      <div class="organizer-bar" id="organizer-bar"></div>
+      <div class="organizer-grid" id="organizer-grid"></div>
+    </section>
+
+    <aside class="panel doc-only" id="panel"></aside>
+    <button class="panel-toggle doc-only" id="btn-panel" aria-label="Tool options"></button>
+    <div class="panel-scrim" id="panel-scrim"></div>
+
+    <section class="empty-state" id="empty-state">
+      <div class="drop-card" id="drop-card">
+        <div class="drop-icon" data-icon="file-up"></div>
+        <h1>Edit any PDF</h1>
+        <p>Change existing text, add text and images, sign, highlight, fill forms, and organize pages. Everything stays on this computer.</p>
+        <div class="drop-actions">
+          <button class="btn primary large" id="btn-open" data-icon-left="folder">Open PDF</button>
+        </div>
+        <p class="drop-hint">or drop a PDF anywhere in this window</p>
+        <div class="drop-secondary">
+          <button class="link-btn" id="btn-from-images" data-icon-left="image">Create PDF from images</button>
+          <button class="link-btn" id="btn-blank" data-icon-left="file-plus">Blank document</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="search-bar" id="search-bar" hidden></div>
+  <div class="drop-overlay" id="drop-overlay" hidden><div>Drop to open</div></div>
+  <div class="loading-overlay" id="loading" hidden><div class="spinner"></div><div class="loading-text" id="loading-text">Working…</div></div>
+  <div id="dialogs"></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="tooltip" id="tooltip" hidden></div>
+  <div class="menu-root" id="menus"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Render reads this and builds the service; there is nothing to configure by hand.
+services:
+  - type: web
+    name: pdf-editor
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /api/config
+    envVars:
+      # the name Render gives the service, and any custom domain added later
+      - key: PDF_EDITOR_ALLOWED_HOSTS
+        value: .onrender.com
+      - key: PDF_EDITOR_BEHIND_PROXY
+        value: "1"
+      # free instances get a tenth of a core, so keep the expensive jobs bounded
+      - key: PDF_EDITOR_MAX_UPLOAD_MB
+        value: "25"
+      - key: PDF_EDITOR_MAX_OCR_PAGES
+        value: "5"
+      - key: PDF_EDITOR_SESSIONS_PER_VISITOR
+        value: "3"
+      - key: PDF_EDITOR_SESSIONS_TOTAL
+        value: "60"
+      - key: PDF_EDITOR_SESSION_IDLE_MINUTES
+        value: "20"

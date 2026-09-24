@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# generated: `python tests/make_samples.py` builds these, `tests/test_*.py` fills out/
+tests/samples/
+tests/out/
+
+# local machine things
+.claude/
+PDF Editor.app/
+.env

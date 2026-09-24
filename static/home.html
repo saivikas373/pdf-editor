@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Editor — edit, merge, fill, convert</title>
+  <meta name="description" content="Edit the text inside a PDF, merge and split files, fill forms, sign, redact, convert images to PDF and make scans searchable.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Cpath d='M10 7h8l5 5v13a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z' fill='white'/%3E%3Cpath d='M12.5 21.5l1-3.5 6-6 2.5 2.5-6 6z' fill='%234f46e5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+<body class="home">
+  <header class="home-header">
+    <a class="brand" href="/">
+      <span class="brand-mark" data-icon="logo"></span>
+      <span class="brand-name">PDF Editor</span>
+    </a>
+    <nav class="home-nav">
+      <a href="#edit">Edit</a>
+      <a href="#pages">Pages</a>
+      <a href="#convert">Create &amp; convert</a>
+      <a href="#finish">Finish</a>
+    </nav>
+    <a class="btn primary" href="/editor" data-icon-left="folder">Open the editor</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Every PDF job, in one place</h1>
+      <p class="lede">
+        Change the words already inside a PDF — in the document's own font — then merge, fill,
+        sign, redact, convert and export. Pick a tool below, or drop a file anywhere on this page.
+      </p>
+      <div class="drop" id="drop">
+        <span class="drop-icon" data-icon="upload"></span>
+        <div class="drop-text">
+          <strong>Drop a PDF or image here</strong>
+          <span>or <button class="linklike" id="btn-choose">choose a file</button> — PDF, JPG, PNG, XPS, EPUB, CBZ, SVG</span>
+        </div>
+      </div>
+      <p class="hero-note" id="hero-note"></p>
+    </section>
+
+    <section class="features" id="features"></section>
+  </main>
+
+  <footer class="home-footer">
+    <p>
+      Built on <a href="https://pymupdf.readthedocs.io/" rel="noreferrer">PyMuPDF</a> (MuPDF), which is licensed
+      under the AGPL.
+    </p>
+    <p class="muted" id="footer-note"></p>
+  </footer>
+
+  <div class="busy" id="busy" hidden><div class="busy-box"><span class="spinner"></span><span id="busy-text">Opening…</span></div></div>
+
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Caddy gets the certificate on its own; nothing to renew, nothing to remember.
+{$DOMAIN} {
+	tls {$EMAIL}
+	encode zstd gzip
+
+	# uploads are capped in the editor too; this stops a big one before it arrives
+	request_body {
+		max_size 50MB
+	}
+
+	reverse_proxy editor:8765 {
+		# one request at a time is served, so give slow work (OCR) room to finish
+		transport http {
+			response_header_timeout 300s
+			read_timeout 300s
+		}
+	}
+}

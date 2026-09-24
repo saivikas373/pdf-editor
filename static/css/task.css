@@ -1,0 +1,236 @@
+/* ==========================================================================
+   One job per page: files on the left, its options underneath, one button.
+   ========================================================================== */
+.task-main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.back:hover { color: var(--text); }
+
+.task-main h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+
+.task-main .lede {
+  margin: 0 0 24px;
+  text-align: left;
+  font-size: 14.5px;
+}
+
+/* ------------------------------------------------------------------- files */
+.files {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.file-row.dragging { opacity: 0.4; }
+.file-row.drop-target { border-color: var(--accent); }
+
+.file-grip {
+  cursor: grab;
+  color: var(--text-3);
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+
+.file-grip svg { width: 16px; height: 16px; }
+
+.file-num {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.file-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  flex: none;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.file-drop-x {
+  flex: none;
+  background: none;
+  border: 0;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--text-3);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.file-drop-x:hover { background: var(--surface-3); color: var(--danger); }
+.file-drop-x svg { width: 15px; height: 15px; }
+
+.add-more {
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+
+/* ----------------------------------------------------------------- options */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.options:empty { display: none; }
+
+.opt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.opt > label {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.opt .hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.opt input[type="text"],
+.opt input[type="number"],
+.opt input[type="password"],
+.opt select {
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.opt input:focus,
+.opt select:focus {
+  outline: 2px solid var(--accent-ring);
+  border-color: var(--accent);
+}
+
+.opt.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+}
+
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  background: var(--surface-3);
+  border-radius: 9px;
+  align-self: flex-start;
+  flex-wrap: wrap;
+}
+
+.seg button {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.seg button.on {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+
+/* ------------------------------------------------------------------ action */
+.run-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.run-row .btn.primary {
+  padding: 11px 22px;
+  font-size: 15px;
+}
+
+.status {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.status.error { color: var(--danger); }
+
+/* ------------------------------------------------------------------ result */
+.result {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+  border-radius: var(--radius-lg);
+}
+
+.result h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.result p {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.result .row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

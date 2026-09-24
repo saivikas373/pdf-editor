@@ -1,0 +1,7 @@
+.venv/
+.git/
+tests/out/
+tests/samples/
+**/__pycache__/
+*.pyc
+PDF Editor.app/

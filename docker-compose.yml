@@ -1,0 +1,33 @@
+# Two containers: the editor, and Caddy in front of it for HTTPS.
+# Set DOMAIN and EMAIL, then: docker compose up -d
+services:
+  editor:
+    build: .
+    restart: unless-stopped
+    environment:
+      # the hostname this is served under; requests for anything else are refused
+      PDF_EDITOR_ALLOWED_HOSTS: ${DOMAIN}
+      # AGPL: PyMuPDF requires that people using it over a network can get the source
+      PDF_EDITOR_SOURCE_URL: ${SOURCE_URL:-}
+    expose:
+      - "8765"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+      EMAIL: ${EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - editor
+
+volumes:
+  caddy_data:
+  caddy_config:

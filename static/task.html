@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Editor</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Cpath d='M10 7h8l5 5v13a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z' fill='white'/%3E%3Cpath d='M12.5 21.5l1-3.5 6-6 2.5 2.5-6 6z' fill='%234f46e5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="/css/task.css">
+</head>
+<body class="home task-page">
+  <header class="home-header">
+    <a class="brand" href="/">
+      <span class="brand-mark" data-icon="logo"></span>
+      <span class="brand-name">PDF Editor</span>
+    </a>
+    <nav class="home-nav">
+      <a href="/">All tools</a>
+    </nav>
+    <a class="btn ghost" href="/editor" data-icon-left="folder">Open the editor</a>
+  </header>
+
+  <main class="task-main" id="task-main">
+    <a class="back" href="/">← All tools</a>
+    <h1 id="task-title">…</h1>
+    <p class="lede" id="task-blurb"></p>
+    <div id="task-body"></div>
+  </main>
+
+  <script type="module" src="/js/task.js"></script>
+</body>
+</html>
