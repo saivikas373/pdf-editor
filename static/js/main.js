@@ -226,7 +226,7 @@ function wireHeader() {
   // on a phone the options panel is a drawer: open it, close it, and get out of the
   // way when the document is what matters
   const setPanel = (open) => document.body.classList.toggle('panel-open', open);
-  $('#btn-panel').innerHTML = icon('sidebar');
+  $('#btn-panel').innerHTML = `${icon('sidebar')}<span>Options</span>`;
   $('#btn-panel').addEventListener('click', () => setPanel(!document.body.classList.contains('panel-open')));
   $('#panel-scrim').addEventListener('click', () => setPanel(false));
   $('#viewer').addEventListener('pointerdown', () => setPanel(false));
