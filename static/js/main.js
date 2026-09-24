@@ -534,8 +534,35 @@ async function boot() {
       /* no longer open on the server */
     }
   }
+  watchForNewBuild();
   if (action) runHomeAction(action);
   window.pdfEditor = { S, openFile, loadDocument, tools, objects, viewer, mutate };
+}
+
+// A browser holding yesterday's scripts behaves in ways nobody can explain and no
+// amount of reloading fixes, because the reload is served from cache too.  The page
+// knows which build it was given; if the server has a newer one, say so.
+function watchForNewBuild() {
+  const mine = document.querySelector('meta[name="build"]')?.content;
+  if (!mine) return;
+  const check = async () => {
+    try {
+      const cfg = await getJSON('/api/config');
+      if (String(cfg.build || '') && String(cfg.build) !== mine) {
+        toast('A newer version of the editor is available.', {
+          timeout: 15 * 60 * 1000,  // 0 would mean "dismiss immediately"
+
+          action: () => location.reload(),
+          actionLabel: 'Reload',
+        });
+        return true;
+      }
+    } catch {
+      /* offline or asleep: ask again later */
+    }
+    return false;
+  };
+  setTimeout(async () => { if (!(await check())) setInterval(check, 10 * 60 * 1000); }, 20000);
 }
 
 // What each card on the home page asks the editor to do once it is up.

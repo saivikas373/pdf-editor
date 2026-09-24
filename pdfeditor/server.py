@@ -113,6 +113,7 @@ def api_config(req, m):
         "preload": APP.preload_id if APP.preload_id in APP.sessions else None,
         "appMode": req.server.app_mode,
         "maxUploadMb": round(MAX_BODY / (1024 * 1024)),
+        "build": build_stamp(),
         "sourceUrl": config.SOURCE_URL,
     }
 
@@ -539,6 +540,19 @@ class Handler(BaseHTTPRequestHandler):
         self._send(200, data, ctype, "no-cache")
 
 
+def build_stamp() -> int:
+    """Newest timestamp among the files we serve, i.e. which build this is."""
+    newest = 0
+    for root, _, names in os.walk(STATIC_DIR):
+        for name in names:
+            if name.endswith((".js", ".css", ".html")):
+                try:
+                    newest = max(newest, int(os.path.getmtime(os.path.join(root, name))))
+                except OSError:
+                    continue
+    return newest
+
+
 def _stamp_assets(html: bytes) -> bytes:
     """Put each stylesheet and script's own timestamp in its URL.
 
@@ -555,7 +569,8 @@ def _stamp_assets(html: bytes) -> bytes:
             return match.group(0)
         return b"%s%s?v=%d%s" % (match.group(1), match.group(2), stamp, match.group(3))
 
-    return re.sub(rb'(href="|src=")(/?(?:css|js)/[^"?]+)(")', version, html)
+    html = re.sub(rb'(href="|src=")(/?(?:css|js)/[^"?]+)(")', version, html)
+    return html.replace(b"</head>", b'<meta name="build" content="%d"></head>' % build_stamp(), 1)
 
 
 class Server(ThreadingHTTPServer):
