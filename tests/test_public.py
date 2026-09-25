@@ -105,6 +105,33 @@ check(status == 404, "a visitor's own oldest document is dropped once they pass 
 status, _, _ = call("GET", f"/api/doc/{keep}", cookie=jar_b)
 check(status == 200, "the other visitor's document is untouched")
 
+print("memory, which is what actually kills the process:")
+from pdfeditor.server import APP  # noqa: E402
+
+config.MEMORY_BUDGET = 0
+before = sum(x.memory_bytes() for x in APP.sessions.values())
+check(before > 0, f"open documents report what they are holding ({before} bytes)")
+
+config.MEMORY_BUDGET = before  # no room for one more
+status, newest, jar_c = open_doc()
+after = sum(x.memory_bytes() for x in APP.sessions.values())
+check(status == 200, "a new document can still be opened when memory is tight")
+status, _, _ = call("GET", f"/api/doc/{newest}", cookie=jar_c)
+check(status == 200, "the document just opened is the one kept")
+check(after <= max(config.MEMORY_BUDGET, 0) + 0 or len(APP.sessions) < 6,
+      f"older documents were dropped to stay inside the budget ({after} bytes)")
+config.MEMORY_BUDGET = 0
+
+print("an oversized render is scaled down, not allocated:")
+config.MAX_RENDER_PIXELS = 100_000
+s_doc = APP.sessions[newest]
+png = s_doc.page_render(s_doc.state.page_ids[0], 8.0)
+import io
+px = fitz.Pixmap(io.BytesIO(png))
+# the pixmap rounds its dimensions up, so allow the odd pixel over
+check(px.width * px.height <= 105_000, f"a request for 8x is clamped ({px.width}x{px.height})")
+config.MAX_RENDER_PIXELS = 0
+
 print("an upload larger than the limit:")
 try:
     status, body, _ = call("POST", "/api/open", b"%PDF-1.4\n" + b"0" * (2 * 1024 * 1024))

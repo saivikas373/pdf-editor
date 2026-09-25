@@ -15,6 +15,8 @@ import uuid
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import pymupdf as fitz
+
 from . import __version__, tools
 from .document import LOCK, DocSession, NeedsPassword
 from .fonts import SYSTEM_FONTS
@@ -71,6 +73,28 @@ class App:
                             key=lambda s: s.last_access)
             for old in others[:len(self.sessions) - config.MAX_SESSIONS_TOTAL]:
                 self.sessions.pop(old.id, None)
+        self.trim_memory(keep=session.id)
+
+    def trim_memory(self, keep: str | None = None) -> None:
+        """Drop the least recently used documents until we are inside the budget.
+
+        Counting open documents says nothing about memory when one is 20 MB and the
+        next is 200 KB.  Going over is not a slow service but a killed process, which
+        loses *everyone's* work, so the oldest idle document goes first.
+        """
+        if not config.MEMORY_BUDGET:
+            return
+        total = sum(s.memory_bytes() for s in self.sessions.values())
+        if total <= config.MEMORY_BUDGET:
+            return
+        for s in sorted(self.sessions.values(), key=lambda s: s.last_access):
+            if total <= config.MEMORY_BUDGET:
+                break
+            if s.id in (self.preload_id, keep):
+                continue
+            total -= s.memory_bytes()
+            self.sessions.pop(s.id, None)
+        fitz.TOOLS.store_shrink(100)  # and let MuPDF's own cache go with them
 
     def expire(self) -> None:
         if not config.SESSION_IDLE_MINUTES:
@@ -78,6 +102,7 @@ class App:
         cutoff = time.time() - config.SESSION_IDLE_MINUTES * 60
         for s in [s for s in self.sessions.values() if s.last_access < cutoff and s.id != self.preload_id]:
             self.sessions.pop(s.id, None)
+        self.trim_memory()
 
     def session(self, doc_id: str, visitor: str | None = None) -> DocSession:
         visitor = visitor if visitor is not None else visitor_id()
@@ -119,6 +144,14 @@ def api_config(req, m):
         # and it is dropped this many minutes after the last request touching it
         "public": config.PUBLIC,
         "idleMinutes": config.SESSION_IDLE_MINUTES,
+        # so the limits a deployment is actually running under can be read from
+        # outside it, rather than assumed from whatever the config file says
+        "limits": {
+            "memoryBudgetMb": config.MEMORY_BUDGET // (1024 * 1024),
+            "historyMb": config.MAX_HISTORY_BYTES // (1024 * 1024),
+            "renderMpx": config.MAX_RENDER_PIXELS // 1_000_000,
+            "openDocuments": len(APP.sessions),
+        },
     }
 
 

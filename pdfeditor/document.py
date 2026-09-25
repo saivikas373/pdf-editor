@@ -22,7 +22,6 @@ from . import tounicode
 from .textedit import EditError
 
 MAX_HISTORY = 100
-MAX_HISTORY_BYTES = 1024 * 1024 * 1024
 MAX_OBJECT_JSON = 2_000_000
 
 # PyMuPDF is not thread-safe: every document operation runs under this lock.
@@ -106,6 +105,25 @@ class DocSession:
     def state(self) -> State:
         return self.states[self.index]
 
+    def memory_bytes(self) -> int:
+        """Roughly what this session is holding: every distinct PDF it remembers.
+
+        Undo states share a buffer when a step changed nothing about the file, so
+        count each buffer once.  The live fitz document is a copy of the current
+        one, hence the doubling of that.
+        """
+        seen, total = set(), 0
+        for st in self.states:
+            if id(st.pdf) not in seen:
+                seen.add(id(st.pdf))
+                total += len(st.pdf)
+        total += len(self.state.pdf)  # the open document alongside its state
+        for asset in self.assets.values():
+            data = asset.get("data")
+            if isinstance(data, (bytes, bytearray)):
+                total += len(data)
+        return total
+
     def _push(self, state: State) -> None:
         del self.states[self.index + 1:]
         self.states.append(state)
@@ -122,7 +140,7 @@ class DocSession:
             if id(pdf) not in seen:
                 seen.add(id(pdf))
                 total += len(pdf)
-            if total > MAX_HISTORY_BYTES and i < self.index:
+            if total > config.MAX_HISTORY_BYTES and i < self.index:
                 keep_from = i + 1
                 break
         if keep_from:
@@ -662,6 +680,11 @@ class DocSession:
     def page_render(self, page_id: str, scale: float) -> bytes:
         pno = self.page_index(page_id)
         scale = max(0.05, min(8.0, scale))
+        if config.MAX_RENDER_PIXELS:  # one pixmap must not be the whole machine
+            page = self.doc[pno]
+            pixels = (page.rect.width * scale) * (page.rect.height * scale)
+            if pixels > config.MAX_RENDER_PIXELS:
+                scale *= (config.MAX_RENDER_PIXELS / pixels) ** 0.5
         pix = self.doc[pno].get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False, annots=True)
         return pix.tobytes("png")
 

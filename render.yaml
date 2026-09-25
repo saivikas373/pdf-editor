@@ -23,9 +23,19 @@ services:
         value: "5"
       - key: PDF_EDITOR_SESSIONS_PER_VISITOR
         value: "3"
-      # documents are held in memory and the free instance has 512 MB: too many at
-      # once is an out-of-memory restart, which loses everybody's work at once
+      # Documents are held in memory and the free instance has 512 MB.  Going over
+      # is not a slow service: the process is killed and every open document with
+      # it, so everything below is sized to stay well inside that.
       - key: PDF_EDITOR_SESSIONS_TOTAL
         value: "30"
       - key: PDF_EDITOR_SESSION_IDLE_MINUTES
         value: "20"
+      # all open documents added up, the ceiling that actually matters
+      - key: PDF_EDITOR_MEMORY_BUDGET_MB
+        value: "160"
+      # each undo step is a whole copy of the file; this is per document
+      - key: PDF_EDITOR_MAX_HISTORY_MB
+        value: "40"
+      # a page at 8x is 31 megapixels - 93 MB of pixels - for a single request
+      - key: PDF_EDITOR_MAX_RENDER_MPX
+        value: "8"
