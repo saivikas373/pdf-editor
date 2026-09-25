@@ -108,6 +108,12 @@ check(status == 200, "the other visitor's document is untouched")
 print("memory, which is what actually kills the process:")
 from pdfeditor.server import APP  # noqa: E402
 
+# these must protect a server that was deployed without anyone setting them
+check(config.MEMORY_BUDGET > 0, f"a hostname alone turns on the memory budget ({config.MEMORY_BUDGET >> 20} MB)")
+check(0 < config.MAX_HISTORY_BYTES <= 256 * 1024 * 1024,
+      f"and a history budget a small instance can hold ({config.MAX_HISTORY_BYTES >> 20} MB)")
+check(config.MAX_RENDER_PIXELS > 0, f"and a ceiling on one render ({config.MAX_RENDER_PIXELS // 10**6} Mpx)")
+
 config.MEMORY_BUDGET = 0
 before = sum(x.memory_bytes() for x in APP.sessions.values())
 check(before > 0, f"open documents report what they are holding ({before} bytes)")

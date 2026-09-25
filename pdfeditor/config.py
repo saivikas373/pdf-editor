@@ -75,19 +75,27 @@ SESSION_IDLE_MINUTES = _int("PDF_EDITOR_SESSION_IDLE_MINUTES", 30)
 # the server works on one request at a time, so a long OCR run holds everyone else up
 MAX_OCR_PAGES = _int("PDF_EDITOR_MAX_OCR_PAGES", 0)  # 0 = no limit
 
-# Every undo step is a whole copy of the PDF.  On your own machine the history can
-# be as deep as the machine allows; on a small instance this is the difference
-# between trimming an old undo step and the process being killed outright.
-MAX_HISTORY_BYTES = _int("PDF_EDITOR_MAX_HISTORY_MB", 1024) * 1024 * 1024
+PUBLIC = bool(ALLOWED_HOSTS)  # a hostname was configured: this is not a local tool
+
+# The memory ceilings.  A machine of one's own can use what it has, so these are off
+# there; a server cannot, because going over is not a slow service but a killed
+# process that loses every open document at once.  Configuring a hostname is what
+# says this is a server, so that is what turns the ceilings on - an instance is not
+# left unprotected because nobody thought to set an environment variable.  Each one
+# can still be set explicitly, including back to 0 for no limit.
+_SERVER_DEFAULTS = {"history_mb": 48, "render_mpx": 8, "budget_mb": 160} if PUBLIC else \
+    {"history_mb": 1024, "render_mpx": 0, "budget_mb": 0}
+
+# Every undo step is a whole copy of the PDF, so a deep history on a large file is
+# the difference between trimming an old step and being killed outright.
+MAX_HISTORY_BYTES = _int("PDF_EDITOR_MAX_HISTORY_MB", _SERVER_DEFAULTS["history_mb"]) * 1024 * 1024
 
 # A page rendered at 8x is 31 megapixels, which is ~93 MB of pixels for one request.
-MAX_RENDER_PIXELS = _int("PDF_EDITOR_MAX_RENDER_MPX", 0) * 1_000_000  # 0 = no limit
+MAX_RENDER_PIXELS = _int("PDF_EDITOR_MAX_RENDER_MPX", _SERVER_DEFAULTS["render_mpx"]) * 1_000_000
 
 # Everything open, added up.  Counting documents is a poor proxy for memory when one
 # person's file is 20 MB and another's is 200 KB, so count the bytes instead and drop
 # the least recently used until we are under it.
-MEMORY_BUDGET = _int("PDF_EDITOR_MEMORY_BUDGET_MB", 0) * 1024 * 1024  # 0 = no limit
-
-PUBLIC = bool(ALLOWED_HOSTS)  # a hostname was configured: this is not a local tool
+MEMORY_BUDGET = _int("PDF_EDITOR_MEMORY_BUDGET_MB", _SERVER_DEFAULTS["budget_mb"]) * 1024 * 1024
 
 SOURCE_URL = os.environ.get("PDF_EDITOR_SOURCE_URL", "")  # AGPL: where to get the source
