@@ -116,7 +116,8 @@ async function saveFile(url, body, successLabel) {
   setLoading('Preparing file…');
   try {
     const { blob, filename } = await postForFile(url, body);
-    downloadBlob(blob, filename);
+    setLoading(false);
+    await downloadBlob(blob, filename);
     toast(`${successLabel || 'Downloaded'} ${filename} (${fmtBytes(blob.size)})`, { type: 'success' });
   } finally {
     setLoading(false);

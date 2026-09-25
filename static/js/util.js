@@ -1,4 +1,5 @@
 import { icon } from './icons.js';
+import { saveBlob } from './save.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -76,14 +77,7 @@ export function pickFiles({ accept = '', multiple = false } = {}) {
 }
 
 export function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = h('a', { href: url, download: filename, style: { display: 'none' } });
-  document.body.append(a);
-  a.click();
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-    a.remove();
-  }, 4000);
+  return saveBlob(blob, filename);
 }
 
 export function toast(message, { type = 'info', action, actionLabel, timeout } = {}) {

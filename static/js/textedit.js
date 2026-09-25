@@ -3,7 +3,7 @@ import { S, emit, on, scale, pageById, savePrefs } from './state.js';
 import { mutate, getJSON, docUrl } from './api.js';
 import { h, clamp, toast, isMac, setLoading } from './util.js';
 import { icon } from './icons.js';
-import { layerOf, pageElement, sampleBackground, whenPageImageLoaded, visiblePageIds } from './viewer.js';
+import { layerOf, pageElement, sampleBackground, whenPageImageLoaded, visiblePageIds, viewerEl } from './viewer.js';
 import { cssFont } from './objects.js';
 
 const textCache = new Map();
@@ -403,8 +403,29 @@ function positionToolbar(state) {
   const layer = el.parentElement;
   const top = el.offsetTop - tb.offsetHeight - 8;
   tb.style.top = `${top < 4 ? el.offsetTop + el.offsetHeight + 8 : top}px`;
-  const maxLeft = Math.max(4, (layer?.clientWidth || 800) - tb.offsetWidth - 4);
-  tb.style.left = `${clamp(el.offsetLeft, 4, maxLeft)}px`;
+  tb.style.left = `${clamp(el.offsetLeft, ...toolbarBounds(layer, tb))}px`;
+}
+
+/**
+ * Where the toolbar may sit, in page-layer coordinates. It has to stay on
+ * screen, which on a phone is narrower than the page it belongs to, so the
+ * window has the last word and the page only decides when it is the smaller.
+ */
+function toolbarBounds(layer, tb) {
+  let lo = 4;
+  let hi = Math.max(4, (layer?.clientWidth || 800) - tb.offsetWidth - 4);
+  const view = viewerEl?.getBoundingClientRect();
+  const page = layer?.getBoundingClientRect();
+  if (view && page && view.width) {
+    const left = view.left + 6 - page.left;
+    const right = view.right - 6 - page.left - tb.offsetWidth;
+    if (right > left) {
+      lo = Math.max(lo, left);
+      hi = Math.min(Math.max(hi, lo), right);
+      if (hi < lo) hi = lo;
+    }
+  }
+  return [lo, hi];
 }
 
 function currentText(state) {

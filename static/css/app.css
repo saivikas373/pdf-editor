@@ -470,6 +470,20 @@ body:not(.no-doc) .empty-state { display: none; }
 
 @media (max-width: 760px) {
   :root { --panel-w: 0px; }
+
+  /* the header has to end with Download: everything that would push it off the
+     right edge either goes (a keyboard hint on a phone) or lives in a menu
+     (zoom options, Find & replace under Tools) */
+  .app-header { gap: 6px; padding: 0 8px; }
+  .app-header #btn-help, .app-header #btn-search,
+  .app-header #btn-zoom-in, .app-header #btn-zoom-out { display: none; }
+  .doc-title { min-width: 0; max-width: none; flex: 1 1 auto; padding-left: 6px; }
+  .header-group + .header-group { padding-left: 6px; margin-left: 0; }
+  /* the file name is the only thing that gives way; buttons keep their size */
+  .app-header .header-group, .app-header .split-btn, .app-header .btn { flex: none; }
+  .app-header .btn { padding: 0 10px; }
+  .zoom-value { padding: 0 6px; }
+  #btn-save-path { display: none; }   /* saves back to a path, which a phone has no use for */
   .workspace, body.hide-sidebar .workspace { grid-template-columns: 0 1fr 0; }
 
   /* anchored to the workspace, not the viewport, so it lines up with the document
@@ -531,4 +545,17 @@ body:not(.no-doc) .empty-state { display: none; }
 
   /* desktop-only advice, on a device with no keyboard and no right button */
   .panel-section.tips { display: none; }
+
+  /* the text toolbar is wider than a phone: let it wrap rather than run off
+     the screen, which took Apply and Cancel with it */
+  .edit-toolbar {
+    max-width: calc(100vw - 12px);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 4px;
+  }
+  .edit-toolbar select { max-width: 132px; flex: 1 1 96px; }
+  .edit-toolbar .hint { display: none; }          /* Enter and Esc need a keyboard */
+  .edit-toolbar .icon-btn.small { width: 32px; height: 32px; }
+  .edit-toolbar .sep:first-of-type { display: none; }
 }

@@ -2,6 +2,7 @@
 // what to do with them; the engine below draws the page and runs it.  Nothing here
 // opens the editor unless the job genuinely needs hands on the document.
 import { icon } from './icons.js';
+import { saveBlob } from './save.js';
 
 const H = { 'X-PDF-Editor': '1' };
 
@@ -540,13 +541,8 @@ function runView() {
     status.textContent = 'Working…';
     try {
       const out = await task.run({ files, opts: values, status: (t) => { status.textContent = t; } });
-      const url = URL.createObjectURL(out.blob);
-      const link = el('a', { href: url, download: out.filename });
-      document.body.append(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-      render({ ...out, url });
+      render({ ...out, url: URL.createObjectURL(out.blob) });
+      await saveBlob(out.blob, out.filename);
     } catch (err) {
       status.classList.add('error');
       status.textContent = err.message || 'Something went wrong.';
@@ -559,7 +555,7 @@ function runView() {
 function resultCard(out) {
   const url = URL.createObjectURL(out.blob);
   return el('div', { class: 'result' },
-    el('h2', { text: `${task.done}. Your download has started.` }),
+    el('h2', { text: `${task.done}. Your file is ready.` }),
     el('p', { text: [out.filename, out.note].filter(Boolean).join(' · ') }),
     el('div', { class: 'row' },
       el('a', { class: 'btn primary', href: url, download: out.filename, text: 'Download again' }),
