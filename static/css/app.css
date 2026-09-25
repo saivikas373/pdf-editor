@@ -368,6 +368,8 @@ body:not(.no-doc) .empty-state { display: none; }
 .drop-card p { margin: 0 auto; max-width: 420px; color: var(--text-2); font-size: 14px; line-height: 1.5; }
 .drop-actions { margin: 22px 0 8px; }
 .drop-card .drop-hint { font-size: 12px; color: var(--text-3); }
+.drop-card .drop-note { font-size: 12px; line-height: 1.5; color: var(--text-3); max-width: 44ch; margin: 10px auto 0; }
+.drop-card .drop-note a { color: var(--text-3); }
 .drop-secondary { display: flex; justify-content: center; gap: 14px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
 
 /* ---------- search bar ---------- */

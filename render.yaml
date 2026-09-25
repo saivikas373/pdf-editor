@@ -23,7 +23,9 @@ services:
         value: "5"
       - key: PDF_EDITOR_SESSIONS_PER_VISITOR
         value: "3"
+      # documents are held in memory and the free instance has 512 MB: too many at
+      # once is an out-of-memory restart, which loses everybody's work at once
       - key: PDF_EDITOR_SESSIONS_TOTAL
-        value: "60"
+        value: "30"
       - key: PDF_EDITOR_SESSION_IDLE_MINUTES
         value: "20"

@@ -115,6 +115,10 @@ def api_config(req, m):
         "maxUploadMb": round(MAX_BODY / (1024 * 1024)),
         "build": build_stamp(),
         "sourceUrl": config.SOURCE_URL,
+        # what the pages may honestly promise: on a server the file is uploaded,
+        # and it is dropped this many minutes after the last request touching it
+        "public": config.PUBLIC,
+        "idleMinutes": config.SESSION_IDLE_MINUTES,
     }
 
 
