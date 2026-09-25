@@ -16,6 +16,21 @@ import { openSignatureDialog } from './signature.js';
 
 const K = isMac ? '⌘' : 'Ctrl+';
 
+// ------------------------------------------------------------------ options drawer
+/** On a phone the options panel is a drawer; on a wide screen it is always there. */
+const narrow = () => window.matchMedia('(max-width: 760px)').matches;
+const setPanel = (open) => document.body.classList.toggle('panel-open', open && narrow());
+
+// tools whose panel is worth interrupting the page for: 'select' only carries
+// mouse-and-keyboard tips, and image/sign open a dialog of their own
+const NO_OPTIONS = new Set(['select', 'image', 'signature']);
+
+/** Picking a tool on a phone should show what that tool can do, not hide it behind a tab. */
+function showToolOptions(id) {
+  if (!narrow() || NO_OPTIONS.has(id) || !S.doc || S.view === 'pages') return;
+  setPanel(true);
+}
+
 // ------------------------------------------------------------------ toolbar
 function buildToolbar() {
   const bar = $('#toolbar');
@@ -27,7 +42,7 @@ function buildToolbar() {
     }
     const b = h('button', { class: `tool-btn${t.id === S.tool ? ' active' : ''}`, dataset: { tool: t.id }, 'data-tip': t.tip },
       h('span', { class: 'tool-icon', html: icon(t.icon) }), h('span', { class: 'tool-label', text: t.label }));
-    b.addEventListener('click', () => tools.setTool(t.id));
+    b.addEventListener('click', () => { tools.setTool(t.id); showToolOptions(t.id); });
     items.push(b);
   }
   items.push(h('div', { class: 'grow' }));
@@ -225,11 +240,14 @@ async function redo() {
 
 // ------------------------------------------------------------------ header
 function wireHeader() {
-  // on a phone the options panel is a drawer: open it, close it, and get out of the
-  // way when the document is what matters
-  const setPanel = (open) => document.body.classList.toggle('panel-open', open);
-  $('#btn-panel').innerHTML = `${icon('sidebar')}<span>Options</span>`;
-  $('#btn-panel').addEventListener('click', () => setPanel(!document.body.classList.contains('panel-open')));
+  const toggle = $('#btn-panel');
+  const paintToggle = () => {
+    const open = document.body.classList.contains('panel-open');
+    toggle.innerHTML = open ? `${icon('x')}<span>Close</span>` : `${icon('sidebar')}<span>Options</span>`;
+  };
+  paintToggle();
+  new MutationObserver(paintToggle).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  toggle.addEventListener('click', () => setPanel(!document.body.classList.contains('panel-open')));
   $('#panel-scrim').addEventListener('click', () => setPanel(false));
   $('#viewer').addEventListener('pointerdown', () => setPanel(false));
   on('doc', () => setPanel(false));
