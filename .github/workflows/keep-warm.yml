@@ -2,26 +2,64 @@
 # which is a poor first impression for anyone arriving from a link. This pings it so
 # it stays awake.
 #
+# GitHub runs scheduled workflows when it has capacity, not when the cron says: a
+# "*/10" schedule in practice fires every few hours, which leaves the instance asleep
+# for most of the day. So each run stays alive and pings on its own clock instead of
+# relying on the schedule to come back. The repository is public, where Actions
+# minutes are free, so a long run costs nothing.
+#
 # To turn it on: repo Settings -> Secrets and variables -> Actions -> Variables ->
 # New variable, named PING_URL, set to your service's address. Without it this does
 # nothing.
+#
+# Before a launch, run it by hand (Actions -> this workflow -> Run workflow) and give
+# it the number of minutes you want covered.
 name: keep the editor awake
 
 on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
+    inputs:
+      minutes:
+        description: "How long to keep pinging, in minutes (max 330)"
+        required: false
+        default: "50"
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 340
     steps:
       - name: Ping
         run: |
-          if [ -z "${{ vars.PING_URL }}" ]; then
+          set -u
+          url="${{ vars.PING_URL }}"
+          if [ -z "$url" ]; then
             echo "PING_URL is not set; nothing to do."
             exit 0
           fi
-          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 "${{ vars.PING_URL }}/api/config")
-          echo "${{ vars.PING_URL }} -> $code"
-          [ "$code" = "200" ]
+          minutes="${{ inputs.minutes || '50' }}"
+          case "$minutes" in ''|*[!0-9]*) minutes=50 ;; esac
+          [ "$minutes" -gt 330 ] && minutes=330
+          [ "$minutes" -lt 1 ] && minutes=1
+
+          deadline=$(( $(date +%s) + minutes * 60 ))
+          ok=0
+          failed=0
+          while :; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 "$url/api/config" || echo 000)
+            if [ "$code" = "200" ]; then
+              ok=$((ok + 1))
+            else
+              failed=$((failed + 1))
+              echo "::warning::$url -> $code"
+            fi
+            [ "$(date +%s)" -ge "$deadline" ] && break
+            sleep 300   # five minutes: the instance sleeps after fifteen
+          done
+
+          echo "$ok healthy, $failed failed over ${minutes}m"
+          # a single blip (a dropped TLS handshake, a deploy restarting) is not news;
+          # never reaching it at all is
+          [ "$ok" -gt 0 ]
