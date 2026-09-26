@@ -248,12 +248,6 @@ async function checkServer() {
       const p = document.querySelector('.home-footer p');
       p.append(' Source code: ', Object.assign(document.createElement('a'), { href: config.sourceUrl, textContent: config.sourceUrl }));
     }
-    if (config.public) {  // people arriving here deserve to know where their file goes
-      const kept = config.idleMinutes ? `, and deleted ${config.idleMinutes} minutes after you stop working on it` : '';
-      const p = document.createElement('p');
-      p.textContent = `Files are uploaded to this server so they can be worked on. They are private to you${kept}. Nothing is shared, sold or used for anything else.`;
-      document.querySelector('.home-footer').prepend(p);
-    }
     $('#footer-note').textContent = `Version ${config.version} · ${config.fonts.length} fonts available for matching`;
   } catch {
     say('Could not reach the editor server. Is it running?', true);

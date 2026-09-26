@@ -536,7 +536,6 @@ async function boot() {
     beat();
     setInterval(beat, 15000);
   }
-  describeServer();
   // a document handed over by the home page, else what this tab was editing before a
   // reload, else the file passed on the command line
   const params = new URLSearchParams(location.search);
@@ -556,32 +555,6 @@ async function boot() {
   watchForNewBuild();
   if (action) runHomeAction(action);
   window.pdfEditor = { S, openFile, loadDocument, tools, objects, viewer, mutate };
-}
-
-/**
- * Tell people where their file actually goes. On someone's own machine nothing
- * leaves it; on a server it is uploaded, and saying otherwise would be a lie.
- * The source offer belongs here too: the AGPL is owed to whoever uses this over
- * a network, and plenty of them will never see the home page.
- */
-function describeServer() {
-  const { public: hosted, idleMinutes, sourceUrl } = S.config;
-  if (hosted) {
-    const kept = idleMinutes
-      ? `Your file is uploaded to this server so it can be worked on, is private to you, and is deleted ${idleMinutes} minutes after you stop working on it.`
-      : 'Your file is uploaded to this server so it can be worked on, and is private to you.';
-    $('#drop-blurb').textContent = 'Change existing text, add text and images, sign, highlight, fill forms, and organize pages.';
-    const note = $('#drop-note');
-    note.textContent = kept;
-    note.hidden = false;
-  }
-  if (sourceUrl) {
-    const note = $('#drop-note');
-    note.append(note.textContent ? ' ' : '', Object.assign(document.createElement('a'), {
-      href: sourceUrl, textContent: 'Source code', rel: 'noreferrer', target: '_blank',
-    }));
-    note.hidden = false;
-  }
 }
 
 // A browser holding yesterday's scripts behaves in ways nobody can explain and no

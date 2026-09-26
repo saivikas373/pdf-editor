@@ -607,7 +607,31 @@ def _stamp_assets(html: bytes) -> bytes:
         return b"%s%s?v=%d%s" % (match.group(1), match.group(2), stamp, match.group(3))
 
     html = re.sub(rb'(href="|src=")(/?(?:css|js)/[^"?]+)(")', version, html)
+    html = html.replace(b"<!--privacy-note-->", _privacy_note(), 1)
+    html = html.replace(b"<!--privacy-note:card-->", _privacy_note(card=True), 1)
+    html = html.replace(b"<!--on-this-computer-->",
+                        b"" if config.PUBLIC else b"Everything stays on this computer.", 1)
     return html.replace(b"</head>", b'<meta name="build" content="%d"></head>' % build_stamp(), 1)
+
+
+def _privacy_note(card: bool = False) -> bytes:
+    """Where a file goes, written into the page rather than added to it afterwards.
+
+    Filling this in from JavaScript once /api/config answered moved the footer after
+    it had already been painted - a layout shift, and a measurable one.
+    """
+    source = ""
+    if config.SOURCE_URL:  # AGPL: owed to anyone using this over a network
+        source = ' <a href="%s" rel="noreferrer" target="_blank">Source code</a>' % config.SOURCE_URL
+    if not config.PUBLIC:
+        return source.encode()
+    kept = (", and deleted %d minutes after you stop working on it" % config.SESSION_IDLE_MINUTES
+            if config.SESSION_IDLE_MINUTES else "")
+    if card:
+        return ("Your file is uploaded to this server so it can be worked on, is private to you%s.%s"
+                % (kept, source)).encode()
+    return ("<p>Files are uploaded to this server so they can be worked on. They are private to "
+            "you%s. Nothing is shared, sold or used for anything else.%s</p>" % (kept, source)).encode()
 
 
 class Server(ThreadingHTTPServer):
